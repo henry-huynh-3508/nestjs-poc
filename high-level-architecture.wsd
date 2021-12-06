@@ -1,0 +1,29 @@
+@startuml
+actor "Frontend App" as fe
+participant "Auth0" as auth
+participant "GraphQL Server" as be
+database "Postgres" as db
+participant "Azure Blob" as storage
+group Add New Admin User
+fe -> auth: addUser
+auth -> be:  trigger updateAdminRole
+be -> db: user.create({\n id,\n email,\n  role,\n  createdAt\n})
+be -> db: project.create({\n id,admin:[],\n createdAt\n}) 
+auth --> fe: {token}
+end
+group Add New Cleaner as Admin
+fe -> be: addCleaner({\n email,\n createdAt\n ,\})
+be --> db:user.create({\n id,\n email,\n  role,\n  createdAt\n})
+be --> storage: storage avatar
+end
+group Edit Cleaner as Admin
+fe -> be: editCleaner({id\n email,\n createdAt\n ,\})
+be --> db:user.edit({\n id,\n email,\n  role,\n  createdAt\n})
+be --> storage: storage avatar
+end
+group Delete Cleaner as Admin
+fe -> be: addCleaner({id})
+be --> db:user.delete({\n id,\n email,\n  role,\n  createdAt\n})
+be --> storage: storage avatar
+end
+@enduml
